@@ -8,7 +8,8 @@ import helper
 trackUidRegex = re.compile('trackUid: "([^"]*)"')
 lyricIdCheckSumRegex = re.compile('return fetchFullLyrics\((\d*), (\d*), false\)')
 
-def getLyrics(artist, track):
+def getLyrics(track, artist):
+    # TODO: urllib.urlencode (urllib.quote/quote_plus is not unicode-safe)
     url = 'http://www.pandora.com/music/song/%s/%s' % (urllib.quote_plus(artist.lower()), urllib.quote_plus(track.lower()))
     ret = helper.getSourceCode(url)
 
@@ -44,4 +45,4 @@ def decryptLyrics(encryptedLyrics, decryptionKey):
     decryptedLyrics = ""
     for i in range(0, len(encryptedLyrics)):
         decryptedLyrics += unichr(ord(encryptedLyrics[i]) ^ ord(decryptionKey[i % len(decryptionKey)]) )
-    return decryptedLyrics
+    return {'lyrics': decryptedLyrics}
