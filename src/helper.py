@@ -15,7 +15,7 @@ def getSourceCode(url):
 
 def unescape(filePath):
     """
-    Fix Windows pathname forbidden characters.
+    Fix Windows pathname forbidden characters, by replacing them with an underscore
     """
     forbiddenChars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
     for char in forbiddenChars:
@@ -27,9 +27,10 @@ def cleanPath(path):
     Rename path components to valid ones.
     """
     path = unescape(path)
-    if path == '':
-        path = 'Unknown'
-    return path
+    if (len(path.strip()) == 0):
+        return 'Untitled'
+    else:
+        return path.strip().rstrip('.')
 
 def removeEmptyDirectories(root):
     for dir, subdirs, files in os.walk(root):

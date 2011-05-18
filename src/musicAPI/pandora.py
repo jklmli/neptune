@@ -9,13 +9,19 @@ trackUidRegex = re.compile('trackUid: "([^"]*)"')
 lyricIdCheckSumRegex = re.compile('return fetchFullLyrics\((\d*), (\d*), false\)')
 
 def getLyrics(track, artist):
-    # TODO: urllib.urlencode (urllib.quote/quote_plus is not unicode-safe)
+    """
+    Returns lyrics as a string based on given input
+    If no match found, raises NoMatchError
+    """
+    track = track.encode('utf-8')
+    artist = artist.encode('utf-8')
     url = 'http://www.pandora.com/music/song/%s/%s' % (urllib.quote_plus(artist.lower()), urllib.quote_plus(track.lower()))
     ret = helper.getSourceCode(url)
 
     try:
         trackUid = trackUidRegex.search(ret).group(1)
         intermMatch = lyricIdCheckSumRegex.search(ret)
+
         lyricId = intermMatch.group(1)
         checkSum = intermMatch.group(2)
         nonExplicit = 'false'
@@ -32,6 +38,7 @@ def getEncryptedLyrics(trackUid, lyricId, checkSum, nonExplicit, authToken):
     decryptionKey = re.search('var k="([^"]*)"', ret).group(1)
 
     # functions in javascript can contain ", which makes python dictionary parsing throw errors
+    # workaround by replacing them out
     ret = re.sub('(function[^,]*)', '0', ret).replace('\\u00',r'\x')
 
     # use ast.literal_eval vs. eval because it's safer

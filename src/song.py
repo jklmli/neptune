@@ -2,6 +2,7 @@ import urllib
 
 import mutagen
 from mutagen.easyid3 import EasyID3, EasyID3KeyError
+from compatid3 import CompatID3
 
 def picture_get(id3, key):
 	pics = [frame.data for frame in id3.getall('APIC')]
@@ -63,6 +64,7 @@ class Song:
 			self.tags = EasyID3(location)
 			self.tagsToReplace = tagsToReplace
 			self.location = location
+			self.newTags = EasyID3()
 		except mutagen.id3.ID3NoHeaderError:
 			# this isn't an audio file!
 			raise
@@ -76,3 +78,9 @@ class Song:
 			self.tags[key] = value
 		else:
 			raise IrreplaceableKeyError(key)
+
+	def save(self):
+		self.tags.save(filename=self.location)
+		self.tags = CompatID3(self.location)
+		self.tags.update_to_v23()
+		self.tags.save(filename=self.location, v2=3)

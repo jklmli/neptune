@@ -1,4 +1,5 @@
 import os
+import sys
 
 import helper
 import musicAPI.lastFM
@@ -38,23 +39,29 @@ def tagSong(root, location):
     print(info)
 
     for tag in info:
-        song.tags[tag] = info[tag]
+        if info[tag]:
+            song.newTags[tag] = info[tag]
 
     lyrics = musicAPI.pandora.getLyrics(song.tags['artist'][0], song.tags['title'][0])
     if lyrics:
-        song.tags['lyrics'] = lyrics
+        song.newTags['lyrics'] = lyrics
 
-    song.tags.save()
+    song.save()
 
-    artist = helper.cleanPath(song.tags['artist'][0])
-    album = helper.cleanPath(song.tags['album'][0])
-    title = helper.cleanPath(song.tags['title'][0])
+    artist = helper.cleanPath(song.newTags['artist'][0])
+    album = helper.cleanPath(song.newTags['album'][0])
+    title = helper.cleanPath(song.newTags['title'][0])
+
+    # fixes for Unicode encoding in system filenames into UTF-8
+    # INFO: http://docs.python.org/library/sys.html
+    location = location.decode(sys.getfilesystemencoding())
+    root = root.decode(sys.getfilesystemencoding())
 
     extension = os.path.splitext(location)[1]
     newLocation = os.path.join(root, artist, album, title + extension)
-    print(location.encode('utf-8'))
-    print(location.encode('utf-8') + 'x')
-    print(newLocation.encode('utf-8'))
+    print(location)
+    print(location + 'x')
+    print(newLocation)
     if os.path.exists(newLocation) is False or os.path.abspath(location) == os.path.abspath(newLocation) is False or location != newLocation:
         # workaround for inability to rename to already existing file (i.e. case-sensitiviy)
         os.renames(location, location + 'x')
@@ -79,4 +86,3 @@ def tagDirectory(root):
                     # need error message here in case of permission error
                     pass
     """
-
