@@ -10,8 +10,9 @@ lyricIdCheckSumRegex = re.compile('return fetchFullLyrics\((\d*), (\d*), false\)
 
 def getLyrics(track, artist):
     """
-    Returns lyrics as a string based on given input
-    If no match found, raises NoMatchError
+    Returns a dictionary with possible keys:
+    lyrics
+    If no match found, returns empty dictionary
     """
     track = track.encode('utf-8')
     artist = artist.encode('utf-8')
@@ -27,7 +28,7 @@ def getLyrics(track, artist):
         nonExplicit = 'false'
         authToken = 'null'
     except AttributeError:
-        return None
+        return {}
     else:
         return getEncryptedLyrics(trackUid, lyricId, checkSum, nonExplicit, authToken)
 

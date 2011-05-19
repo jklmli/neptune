@@ -36,21 +36,21 @@ def tagSong(root, location):
         if tag in info:
             del info[tag]
 
-    print(info)
+    print [(k,v) for (k,v) in info.items() if k != 'picture']
 
     for tag in info:
         if info[tag]:
-            song.newTags[tag] = info[tag]
+            song.tags[tag] = info[tag]
 
     lyrics = musicAPI.pandora.getLyrics(song.tags['artist'][0], song.tags['title'][0])
     if lyrics:
-        song.newTags['lyrics'] = lyrics
+        song.tags['lyrics'] = lyrics
+
+    artist = helper.cleanPath(song.tags['artist'][0])
+    album = helper.cleanPath(song.tags['album'][0])
+    title = helper.cleanPath(song.tags['title'][0])
 
     song.save()
-
-    artist = helper.cleanPath(song.newTags['artist'][0])
-    album = helper.cleanPath(song.newTags['album'][0])
-    title = helper.cleanPath(song.newTags['title'][0])
 
     # fixes for Unicode encoding in system filenames into UTF-8
     # INFO: http://docs.python.org/library/sys.html
@@ -59,9 +59,9 @@ def tagSong(root, location):
 
     extension = os.path.splitext(location)[1]
     newLocation = os.path.join(root, artist, album, title + extension)
-    print(location)
-    print(location + 'x')
-    print(newLocation)
+#    print(location)
+#    print(location + 'x')
+#    print(newLocation)
     if os.path.exists(newLocation) is False or os.path.abspath(location) == os.path.abspath(newLocation) is False or location != newLocation:
         # workaround for inability to rename to already existing file (i.e. case-sensitiviy)
         os.renames(location, location + 'x')

@@ -1,5 +1,3 @@
-import urllib
-
 import mutagen
 from mutagen.easyid3 import EasyID3, EasyID3KeyError
 from compatid3 import CompatID3
@@ -11,11 +9,10 @@ def picture_get(id3, key):
 	else:
 		raise EasyID3KeyError(key)
 
+# value is a dictionary with keys:
+# mimetype, data
 def picture_set(id3, key, value):
-	(file, hdr) = urllib.urlretrieve(value[0])
-	mimetype = hdr['Content-Type']
-	rawData = open(file, 'rb').read()
-	id3.add(mutagen.id3.APIC(encoding=3, mime=mimetype, type=3, desc='Cover (front)', data = rawData))
+	id3.add(mutagen.id3.APIC(encoding=3, mime=value['mimetype'], type=3, desc='Cover (front)', data = value['data']))
 
 def picture_delete(id3, key):
 	id3.delall('APIC')
