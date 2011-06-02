@@ -8,3 +8,7 @@ src/__pycache__/
 .settings/
 .pydevproject
 .project
+
+# music_apis #
+##############
+src/music_apis/.gitignore
