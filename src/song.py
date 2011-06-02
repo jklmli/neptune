@@ -1,6 +1,6 @@
 import mutagen
-from mutagen.easyid3 import EasyID3, EasyID3KeyError
 from compatid3 import CompatID3
+from mutagen.easyid3 import EasyID3, EasyID3KeyError
 
 def picture_get(id3, key):
 	pics = [frame.data for frame in id3.getall('APIC')]

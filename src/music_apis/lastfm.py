@@ -1,14 +1,34 @@
-import xml.etree.ElementTree
+# Copyright (C) 2011 598074 (http://github.com/598074)
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
 import urllib
 import urllib2
+import xml.etree.ElementTree
 
-from helper import getSourceCode
-from musicAPI import lastFM_api_key
+from util import getSourceCode
+from music_apis import LASTFM_API_KEY
 
 albumCache = {}
 pictureCache = {}
 
 def getPicture(url):
+    """
+    Returns a dictionary with possible keys:
+    'mimetype', 'data'
+    """
     if url in pictureCache:
         return pictureCache[url]
     (file, hdr) = urllib.urlretrieve(url)
@@ -28,11 +48,12 @@ def getTrackInfo(track, artist):
     track = track.encode('utf-8')
     artist = artist.encode('utf-8')
     try:
-        url = "http://ws.audioscrobbler.com/2.0/?method=track.getinfo&"
-        url += urllib.urlencode(    {'api_key':lastFM_api_key,
-                                     'artist':artist,
-                                     'track':track,
-                                     'autocorrect':1    }   )
+        url = 'http://ws.audioscrobbler.com/2.0/?'
+        url += urllib.urlencode({   'method'        :'track.getinfo',
+                                    'api_key'       :LASTFM_API_KEY,
+                                    'artist'        :artist,
+                                    'track'         :track,
+                                    'autocorrect'   :1                  })
 
         ret = getSourceCode(url)
     #except urllib2.HTTPError:
@@ -40,7 +61,6 @@ def getTrackInfo(track, artist):
         return {}
     else:
         info = {}
-        #tree = xml.etree.ElementTree.XML(ret, parser=xml.etree.ElementTree.XMLParser(encoding='mbcs'))
         tree = xml.etree.ElementTree.XML(ret)
         if tree is not None:
             tree = tree.find('track')
@@ -67,11 +87,12 @@ def getAlbumInfo(album, artist):
     album = album.encode('utf-8')
     artist = artist.encode('utf-8')
     try:
-        url = "http://ws.audioscrobbler.com/2.0/?method=album.getinfo&"
-        url += urllib.urlencode(    {'api_key':lastFM_api_key,
-                                     'album':album,
-                                     'artist':artist,
-                                     'autocorrect':1}   )
+        url = 'http://ws.audioscrobbler.com/2.0/?'
+        url += urllib.urlencode({   'method'        :'album.getinfo',
+                                    'api_key'       :LASTFM_API_KEY,
+                                    'album'         :album,
+                                    'artist'        :artist,
+                                    'autocorrect'   :1                  })
         ret = getSourceCode(url)
     except urllib2.HTTPError:
         return {}

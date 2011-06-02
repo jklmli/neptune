@@ -1,12 +1,27 @@
+# Copyright (C) 2011 598074 (http://github.com/598074)
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
 import os
 import sys
 
-import helper
-import musicAPI.lastFM
-import musicAPI.pandora
-from song import Song
-
 import mutagen
+
+from music_apis import lastfm, pandora
+from song import Song
+import util
 
 def tagSong(root, location):
     try:
@@ -16,7 +31,7 @@ def tagSong(root, location):
 
     info = {}
     if song.tags['title'][0] and song.tags['artist'][0]:
-        trackInfo = musicAPI.lastFM.getTrackInfo(song.tags['title'][0], song.tags['artist'][0])
+        trackInfo = lastfm.getTrackInfo(song.tags['title'][0], song.tags['artist'][0])
     if trackInfo:
         if 'album' in trackInfo:
             song.tags['album'] = trackInfo['album']
@@ -24,7 +39,7 @@ def tagSong(root, location):
         info.update(trackInfo)
 
     if song.tags['album'][0] and song.tags['artist'][0]:
-        albumInfo = musicAPI.lastFM.getAlbumInfo(song.tags['album'][0], song.tags['artist'][0])
+        albumInfo = lastfm.getAlbumInfo(song.tags['album'][0], song.tags['artist'][0])
     if albumInfo:
         info.update(albumInfo)
 
@@ -42,13 +57,13 @@ def tagSong(root, location):
         if info[tag]:
             song.tags[tag] = info[tag]
 
-    lyrics = musicAPI.pandora.getLyrics(song.tags['artist'][0], song.tags['title'][0])
+    lyrics = pandora.getLyrics(song.tags['artist'][0], song.tags['title'][0])
     if lyrics:
         song.tags['lyrics'] = lyrics
 
-    artist = helper.cleanPath(song.tags['artist'][0])
-    album = helper.cleanPath(song.tags['album'][0])
-    title = helper.cleanPath(song.tags['title'][0])
+    artist = util.cleanPath(song.tags['artist'][0])
+    album = util.cleanPath(song.tags['album'][0])
+    title = util.cleanPath(song.tags['title'][0])
 
     song.save()
 

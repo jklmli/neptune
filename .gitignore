@@ -1,3 +1,10 @@
+# python #
+##########
 src/__pycache__/
 *.pyc
+
+# eclipse #
+###########
 .settings/
+.pydevproject
+.project
